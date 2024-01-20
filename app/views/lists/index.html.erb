@@ -1,0 +1,10 @@
+<ul>
+  <% @lists.each do |list| %>
+    <li><%= list.name %></li>
+  <% end %>
+</ul>
+
+<%= link_to "Remove", lists_path(@list),
+                data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
+                class: "ms-3 text-danger"
+            %>
