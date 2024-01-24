@@ -1,31 +1,25 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+require 'net/http'
 
-require 'json'
-require 'open-uri'
-
-url = 'http://tmdb.lewagon.com'
-movie_serialized = URI.open(url).read
-movie = JSON.parse(movie_serialized)
-
-15.times do
-  Movie.create(title: title.movie, overview: overview.movie, poster_url: "https://tmdb.lewagon.com/#{poster_url.movie}", rating: movie.vote_average)
+url = URI("https://api.themoviedb.org/3/movie/popular?api_key=3f9ca7c706d7f715c7e6d7920cf6d167")
+movies_json = Net::HTTP.get(url)
+movies = JSON.parse(movies_json)
+# Create lists
 end
-require 'json', 'open-uri'
-
-url = 'https://tmdb.lewagon.com/movie/top_rated'
-movie_list_serialized = URI.open(url).read
-movie_list = JSON.parse(movie_list_serialized)
-
-15.times do |i|
-  Movie.create(title: movie_list['results'][i]['title'], overview: movie_list['results'][i]['overview'],
-               poster_url: "#{url}#{movie_list['results'][i]['poster_path']}",
-               rating: movie_list['results'][i]['vote_average'])
+# Create movies and bookmarks
+movies["results"].each do |movie|
+  created_movie = Movie.create!(
+    title: movie["title"],
+    overview: movie["overview"],
+    poster_url: "https://image.tmdb.org/t/p/w500#{movie["poster_path"]}",
+    rating: movie["vote_average"]
+  )
+  # Create a bookmark for each movie in each list
+  List.all.each do |list|
+    Bookmark.create!(
+      comment: "This is a comment.",
+      movie: created_movie,
+      list: list
+    )
+  end
+  puts "Created successfully!"
 end
