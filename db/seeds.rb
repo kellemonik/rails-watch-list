@@ -3,8 +3,7 @@ require 'net/http'
 url = URI("https://api.themoviedb.org/3/movie/popular?api_key=3f9ca7c706d7f715c7e6d7920cf6d167")
 movies_json = Net::HTTP.get(url)
 movies = JSON.parse(movies_json)
-# Create lists
-end
+
 # Create movies and bookmarks
 movies["results"].each do |movie|
   created_movie = Movie.create!(
